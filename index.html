@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Important Links</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: -100px; /* Moves the title higher */
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .link-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .link-box {
+            width: 200px;
+            height: 150px;
+            background-color: #fff;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden; /* Ensures the "Copied" popup stays inside */
+        }
+
+        .link-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .link-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8); /* semi-transparent background */
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        p {
+            color: #666;
+            font-size: 1em;
+        }
+
+        /* Notification styling (covers entire block) */
+        .copied {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 255, 0, 0.8);
+            color: white;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .show {
+            display: flex !important;
+        }
+
+        /* Add New Block Button */
+        #add-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #add-button:hover {
+            background-color: #555;
+        }
+
+        /* X (delete) button styling */
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Important Links</h1>
+        <div class="link-boxes" id="link-boxes">
+            <div class="link-box" data-link="https://www.linkedin.com/in/your-profile">
+                <div class="link-content">
+                    <h2>LinkedIn</h2>
+                    <p>Connect with me on LinkedIn</p>
+                </div>
+                <div class="copied">Copied!</div>
+                <button class="delete-btn">X</button>
+            </div>
+
+            <div class="link-box" data-link="https://your-portfolio.com">
+                <div class="link-content">
+                    <h2>Portfolio</h2>
+                    <p>View my portfolio</p>
+                </div>
+                <div class="copied">Copied!</div>
+                <button class="delete-btn">X</button>
+            </div>
+        </div>
+
+        <!-- Add New Block Button -->
+        <button id="add-button">Add New Block</button>
+    </div>
+
+    <script>
+        // Get all the link-boxes and the add button
+        const linkContainer = document.getElementById('link-boxes');
+        const addButton = document.getElementById('add-button');
+
+        // Add event listener to handle block deletions
+        function addDeleteFunctionality(linkBox) {
+            const deleteBtn = linkBox.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent block from being clicked when deleting
+                linkBox.remove();
+            });
+        }
+
+        // Add delete functionality to initial blocks
+        document.querySelectorAll('.link-box').forEach(addDeleteFunctionality);
+
+        // Add click event to each link box for copy functionality
+        function addCopyFunctionality(linkBox) {
+            linkBox.addEventListener('click', () => {
+                const link = linkBox.getAttribute('data-link');
+                
+                // Copy the link to the clipboard
+                navigator.clipboard.writeText(link).then(() => {
+                    // Show the "Copied!" notification
+                    const copiedText = linkBox.querySelector('.copied');
+                    copiedText.classList.add('show');
+
+                    // Hide the notification after 2 seconds
+                    setTimeout(() => {
+                        copiedText.classList.remove('show');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            });
+        }
+
+        // Add copy functionality to initial blocks
+        document.querySelectorAll('.link-box').forEach(addCopyFunctionality);
+
+        // Function to add a new block
+        addButton.addEventListener('click', () => {
+            // Prompt user for input
+            const blockTitle = prompt("Enter the block name:");
+            const blockSubtitle = prompt("Enter the subtitle:");
+            const blockLink = prompt("Enter the link:");
+
+            // Validate input (optional)
+            if (!blockTitle || !blockSubtitle || !blockLink) {
+                alert("All fields are required!");
+                return;
+            }
+
+            // Create a new link box
+            const newLinkBox = document.createElement('div');
+            newLinkBox.classList.add('link-box');
+            newLinkBox.setAttribute('data-link', blockLink);
+
+            newLinkBox.innerHTML = `
+                <div class="link-content">
+                    <h2>${blockTitle}</h2>
+                    <p>${blockSubtitle}</p>
+                </div>
+                <div class="copied">Copied!</div>
+                <button class="delete-btn">X</button>
+            `;
+
+            // Append the new link box to the container
+            linkContainer.appendChild(newLinkBox);
+
+            // Add delete functionality to the new block
+            addDeleteFunctionality(newLinkBox);
+
+            // Add copy functionality to the new block
+            addCopyFunctionality(newLinkBox);
+        });
+    </script>
+</body>
+</html>
